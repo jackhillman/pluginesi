@@ -1,0 +1,28 @@
+services:
+  reverse-proxy:
+    image: traefik:v2.7
+    ports:
+      - 8080:8080
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.yml:/etc/traefik/traefik.yml:ro
+      - ../:/plugins-local/src/github.com/jackhillman/pluginesi
+
+  shared:
+    image: nginx:alpine
+    volumes:
+      - ./shared:/usr/share/nginx/html:ro
+    labels:
+      - "traefik.http.middlewares.strip-shared-prefix.stripprefix.prefixes=/shared"
+      - "traefik.http.routers.shared.middlewares=strip-shared-prefix@docker"
+      - "traefik.http.routers.shared.rule=Host(`/shared`)"
+
+  root:
+    image: nginx:alpine
+    volumes:
+      - ./root:/usr/share/nginx/html:ro
+    labels:
+      - "traefik.http.middlewares.esi.plugin.esi.enabled=true"
+      - "traefik.http.routers.root.middlewares=esi@docker"
+      - "traefik.http.routers.root.rule=PathPrefix(`/`)"

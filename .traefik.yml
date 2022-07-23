@@ -1,0 +1,9 @@
+displayName: ESI Plugin
+type: middleware
+
+import: github.com/jackhillman/pluginesi
+
+summary: 'Add support for ESI (Edge Side Includes) via the esi:include="" comment'
+
+testData:
+  Enabled: true
